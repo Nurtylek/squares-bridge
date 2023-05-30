@@ -35,8 +35,7 @@ const buildBridge = (): SqBridge => {
     }
 
     const isSupported = () => {
-        const iosSup = ios && window.webkit.messageHandlers.invoke;
-        return Boolean(android || iosSup);
+        return Boolean(android || ios);
     }
 
     const supports = (method) =>
