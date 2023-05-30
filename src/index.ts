@@ -4,6 +4,8 @@ import {promisifyMethod} from "./utils";
 export interface SqBridge {
     version: string;
     getGeo: () => Promise<GetGeoResponse>;
+    isSupported: () => boolean;
+    supports: (method: string) => boolean;
 }
 
 const getGeoMethod = 'getGeo';
@@ -23,7 +25,7 @@ declare global {
 }
 
 const android = typeof window !== 'undefined' && window.AndroidBridge;
-const ios = typeof window !== 'undefined' && window.webkit.messageHandlers;
+const ios = typeof window !== 'undefined' && window?.webkit?.messageHandlers;
 
 const buildBridge = (): SqBridge => {
     const subs = [];
@@ -58,7 +60,9 @@ const buildBridge = (): SqBridge => {
 
     return  {
         version: String(LIB_VERSION),
-        getGeo: getGeoPromise
+        getGeo: getGeoPromise,
+        isSupported,
+        supports,
     }
 }
 
