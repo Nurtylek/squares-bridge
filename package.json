@@ -1,0 +1,26 @@
+{
+  "name": "squares-bridge",
+  "version": "0.0.0",
+  "description": "bridge to communicate with IOS & ANDROID",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.module.js",
+  "unpkg": "dist/index.umd.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "microbundle",
+    "dev": "microbundle watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "microbundle": "^0.15.1"
+  },
+  "contributors": [
+    {
+      "name": "Koshkar Nurtylek",
+      "email": "nurtylek98@gmail.com"
+    }
+  ]
+}
