@@ -1,6 +1,6 @@
 {
   "name": "squares-bridge",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "bridge to communicate with IOS & ANDROID",
   "source": "src/index.ts",
   "main": "dist/index.js",
