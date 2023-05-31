@@ -1,14 +1,16 @@
 import {LIB_VERSION} from "./version";
-import {promisifyMethod} from "./utils";
 
 export interface SqBridge {
     version: string;
-    getGeo: () => Promise<GetGeoResponse>;
+    getGeo: () => Promise<any>;
     isSupported: () => boolean;
     supports: (method: string) => boolean;
+    showTestMessage: () => Promise<any>;
+    showTestMessageWithoutPromise: () => any
 }
 
 const getGeoMethod = 'getGeo';
+const showTestMessageMethod = 'showTestMessage';
 
 interface GetGeoResponse {
     latitude: number;
@@ -42,27 +44,61 @@ const buildBridge = (): SqBridge => {
         (android && typeof android[method] === 'function') ||
         (ios && ios[method] && typeof ios[method].postMessage === 'function');
 
-    const getGeo = (reqId) => {
+    const getGeo = () => {
         const isAndroid = android && android[getGeoMethod];
         const isIos = ios && ios[getGeoMethod];
 
+        return new Promise((resolve, reject) => {
+            if (isAndroid) {
+                console.log("ANDROID getGeo");
+                const res = android[getGeoMethod]();
+                resolve(res ?? 'empty result');
+            } else if (isIos) {
+                ios[getGeoMethod].postMessage();
+            } else if (typeof window !== 'undefined') {
+                console.log('--getGeo-isUnknown');
+            }
+        })
+    }
+
+    const showTestMessage = () => {
+        const isAndroid = android && android[showTestMessageMethod];
+        const isIos = ios && ios[showTestMessageMethod];
+
+        return new Promise((resolve, reject) => {
+            if (isAndroid) {
+                console.log("ANDROID showTestMessage");
+                const res = android[showTestMessageMethod]();
+                resolve(res ?? 'empty result');
+            } else if (isIos) {
+                ios[showTestMessageMethod].postMessage();
+            } else if (typeof window !== 'undefined') {
+                console.log('--getGeo-isUnknown');
+            }
+        })
+    }
+
+    const showTestMessageWithoutPromise = () => {
+        const isAndroid = android && android[showTestMessageMethod];
+        const isIos = ios && ios[showTestMessageMethod];
+
         if (isAndroid) {
-            android[getGeoMethod](reqId);
-            console.log('android[getGeoMethod](reqId)')
+            console.log("ANDROID showTestMessageWithoutPromise");
+            android[showTestMessageMethod]();
         } else if (isIos) {
-            ios[getGeoMethod].postMessage({ reqId });
+            ios[showTestMessageMethod].postMessage();
         } else if (typeof window !== 'undefined') {
             console.log('--getGeo-isUnknown');
         }
     }
 
-    const getGeoPromise = promisifyMethod(getGeo, getGeoMethod, sub);
-
     return  {
         version: String(LIB_VERSION),
-        getGeo: getGeoPromise,
+        getGeo: getGeo,
         isSupported,
         supports,
+        showTestMessage,
+        showTestMessageWithoutPromise
     }
 }
 
