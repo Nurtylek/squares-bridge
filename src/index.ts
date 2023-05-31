@@ -48,6 +48,7 @@ const buildBridge = (): SqBridge => {
 
         if (isAndroid) {
             android[getGeoMethod](reqId);
+            console.log('android[getGeoMethod](reqId)')
         } else if (isIos) {
             ios[getGeoMethod].postMessage({ reqId });
         } else if (typeof window !== 'undefined') {

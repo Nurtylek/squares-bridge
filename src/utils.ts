@@ -1,20 +1,33 @@
-function createRequestResolver() {
+function createCounter(prefix = 'm:') {
+    return {
+        current: 0,
+        next() {
+            return prefix + ++this.current;
+        },
+    };
+}
+
+function createRequestResolver(prefix: string) {
     type PromiseController = {
         resolve: (value: any) => any;
         reject: (reason: any) => any;
     };
 
+    const counter = createCounter(prefix);
     const promiseControllers: Record<string, PromiseController | null> = {};
 
     return {
-        add(controller: PromiseController): number | string {
-            const id = crypto.randomUUID();
+        add(controller: PromiseController, customId = ''): number | string {
+            console.log('add controller: ', controller)
+            const id = customId + counter.next()
             promiseControllers[id] = controller;
             return id;
         },
 
         resolve<T>(reqId: number | string, data: T, isSuccess: (data: T) => boolean, error: any) {
             const requestPromise = promiseControllers[reqId];
+
+            console.log('resolve: ', requestPromise);
 
             if (requestPromise) {
                 if (isSuccess(error)) {
@@ -31,6 +44,9 @@ function createRequestResolver() {
 
 function handleSubscribe(subscribe: (handler: (event: any) => void) => void, requestResolver: ReturnType<typeof createRequestResolver>) {
     subscribe(event => {
+
+        console.log('has event: ', event);
+
         if (!event.detail) {
             return;
         }
@@ -46,7 +62,8 @@ function handleSubscribe(subscribe: (handler: (event: any) => void) => void, req
 }
 
 export function promisifyMethod(method: Function, methodName: string, subscribe: (fn: any) => void) {
-    const requestResolver = createRequestResolver();
+    console.log({ method });
+    const requestResolver = createRequestResolver(methodName + ':');
 
     handleSubscribe(subscribe, requestResolver)
 
